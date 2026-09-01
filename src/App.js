@@ -20,27 +20,20 @@ function App() {
   }
 
   return (
-    <div style={{ padding: "30px" }}>
-
+    <div className="container" style={{ padding: "30px" }}>
       <h1>Login con Microsoft Entra ID</h1>
-
       <UnauthenticatedTemplate>
-
-        <p>
+        <p className="alert alert-danger mt-3">
           El usuario no está autenticado.
         </p>
-
-        <button onClick={iniciarSesion}>
+        <button onClick={iniciarSesion} className="btn btn-primary">
           Iniciar sesión
         </button>
-
       </UnauthenticatedTemplate>
 
 
       <AuthenticatedTemplate>
-
         <h2>Usuario autenticado</h2>
-
         {accounts.length > 0 && (
           <>
             <p>
@@ -68,11 +61,9 @@ function App() {
             </p>
           </>
         )}
-
-        <button onClick={cerrarSesion}>
+        <button onClick={cerrarSesion} className="btn btn-danger">
           Cerrar sesión
         </button>
-
       </AuthenticatedTemplate>
 
     </div>
