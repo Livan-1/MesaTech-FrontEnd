@@ -1,12 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
-import { loginRequest } from './authConfig';
+import { loginRequest, apiRequest } from './authConfig';
+import { useEffect, useState } from 'react';
+import Axios from 'axios';
 
 
 function App() {
 
   const { instance, accounts } = useMsal();
+  const [usuarioBackend, setUsuarioBackend] = useState(null);
+  const [errorBackend, setErrorBackend] = useState(null);
+
 
   const iniciarSesion = () => {
     instance.loginRedirect(loginRequest)
@@ -18,6 +23,39 @@ function App() {
   const cerrarSesion = () => {
     instance.logoutRedirect();
   }
+  
+  useEffect(() => {
+    if (accounts.length === 0) {
+      return;
+    }
+
+    const obtenerUsuarioBackend = async () => {
+      try {
+        // solicitar a Entra ID un access token
+        const tokenResponse = await instance.acquireTokenSilent({...apiRequest, account: accounts[0]});
+        const accessToken = tokenResponse.accessToken;
+        console.log(accessToken);
+        
+        // consumir servicio ahora que tenemos access token
+        Axios.get("http://localhost:8080/api/usuario", { headers: { Authorization: `Bearer ${accessToken}` }})
+          .then((response) => {
+            console.log(response.data);
+            setUsuarioBackend(response.data);
+          })
+          .catch(
+            (error) => {
+              console.log(error);
+              setErrorBackend("Error consultando api");
+            }
+          )
+      } catch (error) {
+        console.log("Error obteniendo datos", error);
+        setErrorBackend("No fue posible obtener el access token");
+      }
+    }
+
+    obtenerUsuarioBackend();
+  }, [accounts, instance]);
 
   return (
     <div className="container" style={{ padding: "30px" }}>
