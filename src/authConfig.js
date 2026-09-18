@@ -1,9 +1,9 @@
 export const msalConfig = {
     auth: {
-        clientId: "86c59355-8f99-4081-96c9-39db6e13ca08",
+        clientId: "7ec7e5ba-9693-4758-9e2f-73c0900cd68d",
 
         authority:
-            "https://login.microsoftonline.com/ba9c3522-adab-4c57-ac78-dc6131594e07",
+            "https://login.microsoftonline.com/a2d774d1-6d61-457f-8298-3217272b8234",
 
         redirectUri: "http://localhost:3000/"
     },
@@ -19,6 +19,6 @@ export const loginRequest = {
 
 export const apiRequest = {
     scopes: [
-        "api://c639b2a3-10c3-4611-b3c8-8acb71c2afc6/access_as_user"
+        "api://7ec7e5ba-9693-4758-9e2f-73c0900cd68d/access_as_user"
     ]
 };
