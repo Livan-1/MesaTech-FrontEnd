@@ -102,11 +102,16 @@ function App() {
                                             <button type="submit" class="btn btn-primary mt-2">Enviar solicitud</button>
                                         </div>
                                     </form>
-
                                 </div>
-
                             </div>
-
+                        </div>
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mt-1">Consultar solicitudes</h5>
+                            </div>
+                            <div class="card-body">
+                                <button type="button" class="btn btn-primary mt-2">Consultar solicitudes</button>
+                            </div>
                         </div>
 
                         <p class="mt-5">
