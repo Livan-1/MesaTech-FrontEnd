@@ -1,16 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
 import { loginRequest, apiRequest } from './authConfig';
 import { useEffect, useState } from 'react';
 import Axios from 'axios';
 
+// Por si acaso cabros estas variables si estan estudiando el codigo pueden cambiarlas por sus correos pa probar por si acaso
+const rolesPorCorreo = {
+    "l.sepulveda.aulaeduca@gmail.com": "Cliente",
+    "livansepulveda087@gmail.com": "Operador",
+    "liv.sepulveda@duocuc.cl": "Administrador",
+};
+
+const obtenerRol = (correo) => {
+    return rolesPorCorreo[correo] || "Desconocido";
+}
 
 function App() {
 
     const { instance, accounts } = useMsal();
     const [usuarioBackend, setUsuarioBackend] = useState(null);
     const [errorBackend, setErrorBackend] = useState(null);
+    const correo = accounts[0]?.username;
+    const rol = obtenerRol(correo);
 
 
     const iniciarSesion = () => {
@@ -34,6 +45,7 @@ function App() {
                 // solicitar a Entra ID un access token
                 const tokenResponse = await instance.acquireTokenSilent({ ...apiRequest, account: accounts[0] });
                 const accessToken = tokenResponse.accessToken;
+
                 console.log(accessToken);
 
                 // consumir servicio ahora que tenemos access token
@@ -71,7 +83,7 @@ function App() {
 
 
             <AuthenticatedTemplate>
-                <h2 style={{ color: "green" }} className="alert alert-success mt-3">Usuario autenticado con exito</h2>
+                <h2 className="alert alert-success mt-3">Usuario autenticado con exito</h2>
                 {accounts.length > 0 && (
                     <>
                         <div>
@@ -79,42 +91,57 @@ function App() {
                                 Nombre de usuario:
                                 {"  "}
                                 {accounts[0].name}
+                                {"  "}
+                                {correo}
                             </p>
                             <p>
-                                Correo electrónico:
+                                Rol:
                                 {" "}
-                                {accounts[0].username}
+                                {rol}
                             </p>
-                            <p>
-                                id:
-                                {" "}
-                                {accounts[0].idTokenClaims.oid}
-                            </p>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title mt-1">Ingrese los datos de la solicitud</h5>
-                                <div class="card-body">
-                                    <form>
-                                        <div class="form-group">
-                                            <label for="asuntoInput">Asunto de la solicitud</label>
-                                            <input type="text" class="form-control mt-2" id="asuntoInput" placeholder="Ingrese el asunto" />
-                                            <button type="submit" class="btn btn-primary mt-2">Enviar solicitud</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card mt-3">
-                            <div class="card-header">
-                                <h5 class="card-title mt-1">Consultar solicitudes</h5>
-                            </div>
-                            <div class="card-body">
-                                <button type="button" class="btn btn-primary mt-2">Consultar solicitudes</button>
-                            </div>
                         </div>
 
-                        <p class="mt-5">
+                        {rol === "Administrador" && (
+                            <div className="card mt-3">
+                                <div>
+                                    <h2 style={{ color: "green" }} className="alert alert-success mt-3">Bienvenido Administrador</h2>
+                                </div>
+                                <div className="card-header">
+                                    <h5 className="card-title mt-1">Catalogo de categorias/prioridades</h5>
+                                </div>
+                                <div className="card-header">
+                                    <h5 className="card-title mt-1">Solicitudes globales</h5>
+                                </div>
+                                <div className="card-body">
+                                    <button type="button" className="btn btn-primary mt-2">
+                                        Consultar solicitudes
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {rol == "Cliente" && (
+                            <div className="card mt-3">
+                                <div className="card-header">
+                                    <h5 className="card-title mt-1">Ingrese los datos de la solicitud</h5>
+                                </div>
+                                <div className="card-body">
+                                    <form></form>
+                                </div>
+                            </div>
+                        )}
+                        {rol == "Operador" && (
+                            <div className="card mt-3">
+                                <div className="card-header">
+                                    <h5 className="card-title mt-1">Consultar solicitudes asignadas</h5>
+                                    <div className="card-body">
+                                        <button type="button" className="btn btn-primary mt-2">Consultar solicitudes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <p className="mt-5">
                             idTokenClaims:
                             {" "}
                             {JSON.stringify(accounts[0].idTokenClaims)}
