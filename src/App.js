@@ -83,59 +83,158 @@ function App() {
 
 
             <AuthenticatedTemplate>
-                <h2 className="alert alert-success mt-3">Usuario autenticado con exito</h2>
+                <h2 className="mt-3">Usuario autenticado con exito</h2>
                 {accounts.length > 0 && (
                     <>
                         <div>
                             <p>
-                                Nombre de usuario:
+                                <h4>Nombre de usuario:
                                 {"  "}
                                 {accounts[0].name}
                                 {"  "}
-                                {correo}
+                                {correo}</h4>
                             </p>
                             <p>
-                                Rol:
+                                <h3>Rol:
                                 {" "}
-                                {rol}
+                                {rol}</h3>
                             </p>
                         </div>
-
                         {rol === "Administrador" && (
-                            <div className="card mt-3">
-                                <div>
-                                    <h2 style={{ color: "green" }} className="alert alert-success mt-3">Bienvenido Administrador</h2>
-                                </div>
-                                <div className="card-header">
-                                    <h5 className="card-title mt-1">Catalogo de categorias/prioridades</h5>
-                                </div>
-                                <div className="card-header">
-                                    <h5 className="card-title mt-1">Solicitudes globales</h5>
-                                </div>
-                                <div className="card-body">
-                                    <button type="button" className="btn btn-primary mt-2">
-                                        Consultar solicitudes
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                        {rol == "Cliente" && (
-                            <div className="card mt-3">
-                                <div className="card-header">
-                                    <h5 className="card-title mt-1">Ingrese los datos de la solicitud</h5>
-                                </div>
-                                <div className="card-body">
-                                    <form></form>
-                                </div>
-                            </div>
-                        )}
-                        {rol == "Operador" && (
-                            <div className="card mt-3">
-                                <div className="card-header">
-                                    <h5 className="card-title mt-1">Consultar solicitudes asignadas</h5>
+                            <>
+                                <div className="card mt-3 shadow-sm border-0">
                                     <div className="card-body">
-                                        <button type="button" className="btn btn-primary mt-2">Consultar solicitudes
-                                        </button>
+                                        <h5 className="text-success mb-3">Solicitudes Globales</h5>
+                                        <div className="table-responsive">
+                                            <table className="table table-hover align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Título</th>
+                                                        <th>Estado Actual</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    /* aqui va lo de la base de datos */
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="card mt-4 shadow-sm border-0">
+                                    <div className="card-body">
+                                        <h5 className="text-success mb-3">Catálogo de Categorías y Prioridades</h5>
+                                        <div className="d-flex gap-2 mb-4">
+                                            <input type="text" className="form-control w-25" placeholder="Nuevo ítem..." />
+                                            <select className="form-select w-25">
+                                                <option value="CATEGORIA">Categoría</option>
+                                                <option value="PRIORIDAD">Prioridad</option>
+                                            </select>
+                                            <button
+                                                onClick={() => console.log("Agregar al catálogo")}
+                                                className="btn btn-success">
+                                                Agregar
+                                            </button>
+                                        </div>
+                                        <div className="table-responsive w-50">
+                                            <table className="table table-hover align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Nombre</th>
+                                                        <th>Tipo</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    /** aqui va lo de la base de datos */
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        {rol === "Cliente" && (
+                            <div className="card mt-3 shadow-sm">
+                                <div className="card-header bg-primary text-white">
+                                    <h5 className="card-title mb-0">Crear Nueva Solicitud</h5>
+                                </div>
+                                <div className="card-body">
+                                    <form>
+                                        <div className="mb-3">
+                                            <label className="form-label">Título</label>
+                                            <input type="text" className="form-control" />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Descripción</label>
+                                            <textarea className="form-control" rows="2"></textarea>
+                                        </div>
+                                        <div className="row mb-3">
+                                            <div className="col">
+                                                <label className="form-label">Categoría</label>
+                                                <select className="form-select">
+                                                    <option value="">Seleccione...</option>
+                                                    <option value="1">Hardware</option>
+                                                    <option value="2">Software</option>
+                                                </select>
+                                            </div>
+                                            <div className="col">
+                                                <label className="form-label">Prioridad</label>
+                                                <select className="form-select">
+                                                    <option value="">Seleccione...</option>
+                                                    <option value="1">Alta</option>
+                                                    <option value="2">Media</option>
+                                                    <option value="3">Baja</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button type="button" className="btn btn-success w-100">Enviar Solicitud</button>
+                                    </form>
+                                </div>
+
+                                <div className="card-header bg-secondary text-white border-top mt-2">
+                                    <h5 className="card-title mb-0">Mis Solicitudes</h5>
+                                </div>
+                                <div className="card-body">
+                                    <div className="table-responsive">
+                                        <table className="table table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Título</th>
+                                                    <th>Estado</th>
+                                                    <th>Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {/* Fila de ejemplo estática para visualizar la maqueta */}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {rol === "Operador" && (
+                            <div className="card mt-3 shadow-sm border-0">
+                                <div className="card-body">
+                                    <h5 className="text-success mb-3">Gestión de Solicitudes</h5>
+                                    <div className="table-responsive">
+                                        <table className="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Título</th>
+                                                    <th>Estado Actual</th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {/* Fila estática de ejemplo */}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
