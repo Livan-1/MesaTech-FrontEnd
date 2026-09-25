@@ -4,36 +4,31 @@ import { loginRequest, apiRequest } from './authConfig';
 import { useEffect, useState } from 'react';
 import Axios from 'axios';
 
-// Por si acaso cabros estas variables si estan estudiando el codigo pueden cambiarlas por sus correos pa probar por si acaso
-const rolesPorCorreo = {
-    "l.sepulveda.aulaeduca@gmail.com": "Cliente",
-    "livansepulveda087@gmail.com": "Operador",
-    "liv.sepulveda@duocuc.cl": "Administrador",
-};
-
-const obtenerRol = (correo) => {
-    return rolesPorCorreo[correo] || "Desconocido";
-}
-
 function App() {
-
     const { instance, accounts } = useMsal();
     const [usuarioBackend, setUsuarioBackend] = useState(null);
     const [errorBackend, setErrorBackend] = useState(null);
-    const correo = accounts[0]?.username;
-    const rol = obtenerRol(correo);
 
+    // 1. Obtenemos los datos del usuario logueado
+    const correo = accounts[0]?.username;
+    const rolesToken = accounts[0]?.idTokenClaims?.roles;
+
+    // 2. Determinamos el rol leyendo directamente los claims del token de Entra ID
+    const rol = rolesToken?.includes("ROLE_ADMINISTRADOR") ? "Administrador"
+              : rolesToken?.includes("ROLE_OPERADOR") ? "Operador"
+              : rolesToken?.includes("ROLE_CLIENTE") ? "Cliente"
+              : "Desconocido";
 
     const iniciarSesion = () => {
         instance.loginRedirect(loginRequest)
             .catch(error => {
                 console.error(error);
             });
-    }
+    };
 
     const cerrarSesion = () => {
         instance.logoutRedirect();
-    }
+    };
 
     useEffect(() => {
         if (accounts.length === 0) {
@@ -42,29 +37,27 @@ function App() {
 
         const obtenerUsuarioBackend = async () => {
             try {
-                // solicitar a Entra ID un access token
+                // Solicitar a Entra ID un access token
                 const tokenResponse = await instance.acquireTokenSilent({ ...apiRequest, account: accounts[0] });
                 const accessToken = tokenResponse.accessToken;
 
-                console.log(accessToken);
+                console.log("Access Token:", accessToken);
 
-                // consumir servicio ahora que tenemos access token
+                // Consumir servicio con el access token
                 Axios.get("http://localhost:8080/api/usuario", { headers: { Authorization: `Bearer ${accessToken}` } })
                     .then((response) => {
                         console.log(response.data);
                         setUsuarioBackend(response.data);
                     })
-                    .catch(
-                        (error) => {
-                            console.log(error);
-                            setErrorBackend("Error consultando api");
-                        }
-                    )
+                    .catch((error) => {
+                        console.log(error);
+                        setErrorBackend("Error consultando api");
+                    });
             } catch (error) {
                 console.log("Error obteniendo datos", error);
                 setErrorBackend("No fue posible obtener el access token");
             }
-        }
+        };
 
         obtenerUsuarioBackend();
     }, [accounts, instance]);
@@ -72,6 +65,7 @@ function App() {
     return (
         <div className="container" style={{ padding: "30px" }}>
             <h1>Bienvenidos a MesaTech Cloud</h1>
+            
             <UnauthenticatedTemplate>
                 <p className="alert alert-danger mt-3">
                     El usuario no está autenticado.
@@ -81,25 +75,22 @@ function App() {
                 </button>
             </UnauthenticatedTemplate>
 
-
             <AuthenticatedTemplate>
-                <h2 className="mt-3">Usuario autenticado con exito</h2>
+                <h2 className="mt-3">Usuario autenticado con éxito</h2>
                 {accounts.length > 0 && (
                     <>
-                        <div>
-                            <p>
-                                <h4>Nombre de usuario:
-                                {"  "}
-                                {accounts[0].name}
-                                {"  "}
-                                {correo}</h4>
-                            </p>
-                            <p>
-                                <h3>Rol:
-                                {" "}
-                                {rol}</h3>
-                            </p>
+                        <div className="mt-3">
+                            <h4>
+                                Nombre de usuario:{" "}
+                                {accounts[0].name} ({correo})
+                            </h4>
+                            <h3>
+                                Rol:{" "}
+                                <span className="text-primary">{rol}</span>
+                            </h3>
                         </div>
+
+                        {/* VISTA ADMINISTRADOR */}
                         {rol === "Administrador" && (
                             <>
                                 <div className="card mt-3 shadow-sm border-0">
@@ -116,7 +107,7 @@ function App() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    /* aqui va lo de la base de datos */
+                                                    {/* Aquí se conectarán los datos del backend */}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -149,7 +140,7 @@ function App() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    /** aqui va lo de la base de datos */
+                                                    {/* Aquí se conectarán los datos del backend */}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -157,6 +148,8 @@ function App() {
                                 </div>
                             </>
                         )}
+
+                        {/* VISTA CLIENTE */}
                         {rol === "Cliente" && (
                             <div className="card mt-3 shadow-sm">
                                 <div className="card-header bg-primary text-white">
@@ -191,7 +184,9 @@ function App() {
                                                 </select>
                                             </div>
                                         </div>
-                                        <button type="button" className="btn btn-success w-100">Enviar Solicitud</button>
+                                        <button type="button" className="btn btn-success w-100">
+                                            Enviar Solicitud
+                                        </button>
                                     </form>
                                 </div>
 
@@ -210,13 +205,15 @@ function App() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* Fila de ejemplo estática para visualizar la maqueta */}
+                                                {/* Filas dinámicas del backend */}
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         )}
+
+                        {/* VISTA OPERADOR */}
                         {rol === "Operador" && (
                             <div className="card mt-3 shadow-sm border-0">
                                 <div className="card-body">
@@ -232,7 +229,7 @@ function App() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* Fila estática de ejemplo */}
+                                                {/* Filas dinámicas del backend */}
                                             </tbody>
                                         </table>
                                     </div>
@@ -240,18 +237,16 @@ function App() {
                             </div>
                         )}
 
-                        <p className="mt-5">
-                            idTokenClaims:
-                            {" "}
-                            {JSON.stringify(accounts[0].idTokenClaims)}
+                        <p className="mt-5 text-muted small">
+                            <strong>idTokenClaims:</strong> {JSON.stringify(accounts[0].idTokenClaims)}
                         </p>
                     </>
                 )}
-                <button onClick={cerrarSesion} className="btn btn-danger">
+                
+                <button onClick={cerrarSesion} className="btn btn-danger mt-3">
                     Cerrar sesión
                 </button>
             </AuthenticatedTemplate>
-
         </div>
     );
 }
